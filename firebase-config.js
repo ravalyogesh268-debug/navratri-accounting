@@ -8,5 +8,5 @@ const firebaseConfig = {
   messagingSenderId: "...",
   appId: "..."
 };
-
 export { firebaseConfig };
+
