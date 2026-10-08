@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="gu">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#7b1fa2"><title>નવરાત્રી મહોત્સવ હિસાબ</title>
+<link rel="stylesheet" href="styles.css"><script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<style>
+:root{--bg:#f4f0f7;--card:#fff;--text:#1f2430;--muted:#586074;--border:#e7dff4;--p:#7b1fa2;--p2:#e91e63;--income:#2e7d32;--expense:#c62828;--balance:#5e35b1}
+body.dark{--bg:#0f1722;--card:#182535;--text:#edf3ff;--muted:#a7b4ca;--border:#2f4056;--p:#b77af8;--p2:#ff7ab8}
+body{background:var(--bg);color:var(--text);transition:.2s} .panel,.card{background:var(--card);color:var(--text)}
+.tabs{display:flex;gap:8px;overflow:auto;margin:15px 0}.tab{border:1px solid var(--border);background:var(--card);color:var(--text);padding:10px 14px;border-radius:12px;font-weight:700;white-space:nowrap;cursor:pointer}.tab.active{background:linear-gradient(135deg,var(--p),var(--p2));color:#fff;border-color:transparent}
+.chart-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}.chart-box{height:280px;background:var(--card);padding:12px;border-radius:16px;box-shadow:0 2px 12px #00000010}.full{grid-column:1/-1}.admin-head{display:flex;justify-content:space-between;gap:10px;align-items:center;flex-wrap:wrap}.badge{background:#e8f5e9;color:#2e7d32;border-radius:20px;padding:6px 10px;font-size:12px;font-weight:700}.edit{background:#1976d2;color:#fff}.smallbtn{padding:7px 9px;border:0;border-radius:8px;font-weight:700;cursor:pointer}.darkbtn{background:#fff;color:#7b1fa2}.danger{background:#c62828;color:#fff}.form-actions{display:flex;gap:8px;flex-wrap:wrap}.notice{border-radius:10px;padding:10px;margin:10px 0}.ok{background:#e8f5e9;color:#2e7d32}.err{background:#ffebee;color:#c62828}@media(max-width:850px){.chart-grid{grid-template-columns:1fr}}@media(max-width:680px){.container{padding:12px}.cards{grid-template-columns:1fr 1fr}.summary-grid{grid-template-columns:1fr}.formgrid,.grid{grid-template-columns:1fr}.card:last-child{grid-column:auto}.hero h1{font-size:23px}}
+</style>
+</head>
+<body>
+<header class="hero"><div class="container">
+<div>🌺 જાહેર પારદર્શક હિસાબ</div><h1 id="festivalName">નવરાત્રી મહોત્સવ 2026</h1><p>આવક • જાવક • ફાળો • ખર્ચ</p>
+<div class="tabs"><button class="tab active" data-main="public">👥 Public Dashboard</button><button class="tab" data-main="admin">🔐 Admin Login</button><button id="themeBtn" class="tab">🌙 Dark</button></div>
+</div></header>
+<main class="container">
+<div id="status" class="notice">હિસાબ લોડ થઈ રહ્યો છે…</div>
+<section id="publicView">
+<div class="cards"><article class="card income"><span>કુલ આવક</span><strong id="totalIncome">₹0</strong></article><article class="card expense"><span>કુલ ખર્ચ</span><strong id="totalExpense">₹0</strong></article><article class="card balance"><span>હાલની બાકી રકમ</span><strong id="balance">₹0</strong></article><article class="card"><span>કુલ ફાળો આપનાર</span><strong id="donorCount">0</strong></article></div>
+<section class="panel"><h2>💰 આવકનો સારાંશ</h2><div class="summary-grid"><div>અગાઉના વર્ષથી બાકી<b id="previous">₹0</b></div><div>આ વર્ષનો ફાળો<b id="donationsTotal">₹0</b></div><div>અન્ય આવક<b id="otherTotal">₹0</b></div><div>કુલ આવક<b id="incomeSummary">₹0</b></div></div></section>
+<section class="panel"><h2>💳 ફાળો માધ્યમ પ્રમાણે</h2><div id="paymentBreakdown"></div></section>
+<div class="chart-grid"><div class="chart-box"><canvas id="dailyChart"></canvas></div><div class="chart-box"><canvas id="paymentChart"></canvas></div><div class="chart-box"><canvas id="expenseChart"></canvas></div></div>
+<div class="tabs"><button class="tab active" data-public="donations">📥 ફાળો</button><button class="tab" data-public="expenses">📤 ખર્ચ</button><button class="tab" data-public="other">💵 અન્ય આવક</button></div>
+<section id="donations" class="panel"><h2>ફાળો આપનારની યાદી</h2><input id="donationSearch" class="search" placeholder="🔎 નામ / ગામ / માધ્યમ શોધો"><div class="table-wrap"><table><thead><tr><th>તારીખ</th><th>નામ</th><th>ગામ/વિગત</th><th>માધ્યમ</th><th>રકમ</th></tr></thead><tbody id="donationsBody"></tbody></table></div></section>
+<section id="expenses" class="panel hidden"><h2>ખર્ચની વિગત</h2><input id="expenseSearch" class="search" placeholder="🔎 ખર્ચ / વિગત શોધો"><div class="table-wrap"><table><thead><tr><th>તારીખ</th><th>ખર્ચ</th><th>વિગત</th><th>રકમ</th></tr></thead><tbody id="expensesBody"></tbody></table></div></section>
+<section id="other" class="panel hidden"><h2>અન્ય આવક</h2><input id="otherSearch" class="search" placeholder="🔎 આવક / વિગત શોધો"><div class="table-wrap"><table><thead><tr><th>તારીખ</th><th>આવક</th><th>વિગત</th><th>રકમ</th></tr></thead><tbody id="otherBody"></tbody></table></div></section>
+<section class="panel"><h2>🏆 વધુ ફાળો આપનાર</h2><div id="topDonors"></div></section><section class="panel center" id="publicNote"></section>
+</section>
+
+<section id="adminView" class="hidden">
+<section id="loginPanel" class="panel auth-box"><h2>🔐 Admin Login</h2><p class="muted">આ જ link પરથી Admin entry, edit, delete અને settings કરી શકાશે.</p><input id="email" type="email" placeholder="Admin Email" style="width:100%;margin:6px 0"><input id="password" type="password" placeholder="Password" style="width:100%;margin:6px 0"><button id="loginBtn" class="btn primary">Login</button><div id="loginError" class="error"></div></section>
+<div id="appPanel" class="hidden">
+<section class="panel"><div class="admin-head"><div><span class="badge">🔐 Admin Mode</span> <span id="adminEmail"></span></div><div class="form-actions"><button id="reportBtn" class="btn">📥 CSV Report</button><button id="logoutBtn" class="btn danger">🚪 Logout</button></div></div></section>
+<div class="tabs"><button class="tab active" data-admin="entry">➕ Entry / Edit</button><button class="tab" data-admin="records">📋 Records</button><button class="tab" data-admin="settings">⚙️ Settings</button></div>
+<section id="entry" class="panel"><h2 id="entryTitle">➕ નવી નોંધ</h2><div class="grid"><label>પ્રકાર<select id="entryType"><option value="donation">📥 ફાળો</option><option value="expense">📤 ખર્ચ</option><option value="otherIncome">💵 અન્ય આવક</option></select></label><label>તારીખ<input id="entryDate" type="date"></label><label>નામ<input id="entryName"></label><label>ગામ / વિગત<input id="entryDetail"></label><label id="methodWrap">માધ્યમ<select id="entryMethod"><option>Cash</option><option>UPI</option><option>Bank</option><option>Other</option></select></label><label>રકમ<input id="entryAmount" type="number" min="0" step="0.01"></label><label class="full">નોંધ<input id="entryNote"></label></div><br><div class="form-actions"><button id="saveEntry" class="btn primary">💾 Save Entry</button><button id="cancelEdit" class="btn hidden">Cancel Edit</button></div><div id="saveMsg"></div></section>
+<section id="records" class="panel hidden"><h2>📋 રેકોર્ડ મેનેજમેન્ટ</h2><input id="adminSearch" class="search" placeholder="🔎 રેકોર્ડ શોધો"><div id="recordsBody"></div></section>
+<section id="settings" class="panel hidden"><h2>⚙️ હિસાબની સેટિંગ</h2><div class="grid"><label>મહોત્સવનું નામ<input id="sName"></label><label>અગાઉના વર્ષથી બાકી<input id="sPrevious" type="number" min="0"></label><label>સંપર્ક<input id="sContact"></label><label>જાહેર નોંધ<input id="sNote"></label></div><br><button id="saveSettings" class="btn primary">💾 સેટિંગ સાચવો</button></section>
+</div></section>
+</main><footer>નવરાત્રી મહોત્સવ 2026 • એક જ Link પર Public + Admin</footer>
+<script type="module" src="one-link-app.js"></script></body></html>
